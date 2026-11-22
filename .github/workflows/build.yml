@@ -1,0 +1,70 @@
+name: Build Official TWRP for Acer One 8 (T4-82L Gen 2)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build TWRP by Minimal Manifest
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Device Tree
+        uses: actions/checkout@v4
+        with:
+          path: device_tree
+
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt update -y
+          sudo apt install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev \
+            libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev libx11-dev \
+            lib32z1-dev libgl1-mesa-dev libxml2 libxml2-utils xsltproc unzip fontconfig \
+            python3 python-is-python3 libssl-dev bc rsync ccache
+          git config --global user.name "Builder"
+          git config --global user.email "builder@github.com"
+
+      - name: Setup Repo Tool
+        run: |
+          mkdir -p ~/.bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
+          chmod a+x ~/.bin/repo
+          echo "$HOME/.bin" >> $GITHUB_PATH
+
+      - name: Initialize TWRP Minimal Manifest
+        run: |
+          mkdir -p twrp && cd twrp
+          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+
+      - name: Copy Device Tree into Workspace
+        run: |
+          mkdir -p twrp/device/acer/t482l
+          cp -r device_tree/* twrp/device/acer/t482l/
+
+      - name: Compile TWRP Recovery
+        run: |
+          cd twrp
+          export ALLOW_MISSING_DEPENDENCIES=true
+          export LC_ALL="C"
+          source build/envsetup.sh
+          lunch omni_t482l-eng
+          mka recoveryimage vendorbootimage -j$(nproc --all) || mka recoveryimage -j$(nproc --all)
+
+      - name: Upload TWRP Images
+        uses: actions/upload-artifact@v4
+        with:
+          name: TWRP-Acer-One-8
+          path: |
+            twrp/out/target/product/t482l/recovery.img
+            twrp/out/target/product/t482l/vendor_boot.img

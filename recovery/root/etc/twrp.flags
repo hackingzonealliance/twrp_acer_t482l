@@ -1,0 +1,18 @@
+/system_image     emmc    /dev/block/mapper/system          flags=backup=1;flashimg=1;display="System Image"
+/vendor_image     emmc    /dev/block/mapper/vendor          flags=backup=1;flashimg=1;display="Vendor Image"
+/product_image    emmc    /dev/block/mapper/product         flags=backup=1;flashimg=1;display="Product Image"
+/system_ext_image emmc    /dev/block/mapper/system_ext      flags=backup=1;flashimg=1;display="System_EXT Image"
+
+/boot             emmc    /dev/block/by-name/boot           flags=backup=1;flashimg=1;display="Boot"
+/init_boot        emmc    /dev/block/by-name/init_boot      flags=backup=1;flashimg=1;display="Init Boot"
+/vendor_boot      emmc    /dev/block/by-name/vendor_boot    flags=backup=1;flashimg=1;display="Vendor Boot"
+/dtbo             emmc    /dev/block/by-name/dtbo           flags=backup=1;flashimg=1;display="DTBO"
+/vbmeta           emmc    /dev/block/by-name/vbmeta         flags=backup=1;flashimg=1;display="VBMeta"
+/metadata         f2fs    /dev/block/by-name/metadata       flags=backup=1;display="Metadata"
+/data             f2fs    /dev/block/by-name/userdata       flags=backup=1;display="Data"
+/nvram            emmc    /dev/block/by-name/nvram          flags=backup=1;display="NVRAM"
+/nvdata           ext4    /dev/block/by-name/nvdata         flags=backup=1;display="NVDATA"
+/misc             emmc    /dev/block/by-name/misc           flags=display="Misc"
+
+/external_sd      auto    /dev/block/mmcblk1p1 /dev/block/mmcblk1 flags=display="MicroSD Card";storage;wipeingui;removable
+/usb_otg          auto    /dev/block/sda1 /dev/block/sda            flags=display="USB-OTG";storage;wipeingui;removable
