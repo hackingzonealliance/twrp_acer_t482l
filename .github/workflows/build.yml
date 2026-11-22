@@ -60,6 +60,8 @@ jobs:
       - name: Compile TWRP Recovery
         run: |
           cd twrp
+          # Fix rsync symlink collision for vendor/product mount points in recovery
+          find build -type f -name "Makefile" -exec sed -i 's/--exclude=sdcard/--exclude=sdcard --exclude=vendor --exclude=root\/vendor --exclude=product --exclude=root\/product --exclude=system_ext --exclude=root\/system_ext/g' {} +
           export ALLOW_MISSING_DEPENDENCIES=true
           export LC_ALL="C"
           source build/envsetup.sh
