@@ -2,6 +2,8 @@ name: Build Official TWRP for Acer One 8 (T4-82L Gen 2)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
